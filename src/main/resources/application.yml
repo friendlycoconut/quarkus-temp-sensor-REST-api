@@ -1,0 +1,22 @@
+quarkus:
+  banner:
+    enabled: false
+  hibernate-orm:
+    database:
+      generation: none
+
+mp:
+  openapi:
+    extensions:
+      smallrye:
+        info:
+          title: Manufacturer API
+          version: 0.0.1
+          description: API for retrieving manufacturers
+          contact:
+            email: techsupport@redhat.com
+            name: Manufacturer API Support
+            url: https://github.com/quarkus-ground-up/customer-api
+          license:
+            name: Apache 2.0
+            url: http://www.apache.org/licenses/LICENSE-2.0.html

@@ -1,0 +1,174 @@
+openapi: 3.0.3
+info:
+  title: Example API (development)
+  description: Just an example service
+  termsOfService: Your terms here
+  contact:
+    name: Example API Support
+    url: http://exampleurl.com/contact
+    email: techsupport@example.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.1
+tags:
+  - name: manufacturer
+    description: Manufacturer Operations
+paths:
+  /hello:
+    get:
+      tags:
+        - Greeting Resource
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /manufacturers:
+    get:
+      tags:
+        - manufacturer
+      responses:
+        "200":
+          description: Get All Manufacturers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Manufacturer'
+    post:
+      tags:
+        - manufacturer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Manufacturer'
+      responses:
+        "201":
+          description: Manufacturer Created
+          content:
+            application/json:
+              schema:
+                required:
+                  - manufacturerName
+                type: object
+                properties:
+                  manufacturerId:
+                    format: int32
+                    type: integer
+                  manufacturerName:
+                    minLength: 1
+                    type: string
+                  description:
+                    type: string
+                  email:
+                    type: string
+        "400":
+          description: Manufacturer already exists for manufacturerId
+          content:
+            application/json: {}
+  /manufacturers/{manufacturerId}:
+    get:
+      tags:
+        - manufacturer
+      parameters:
+        - name: manufacturerId
+          in: path
+          required: true
+          schema:
+            format: int32
+            type: integer
+      responses:
+        "200":
+          description: Get Manufacturer by manufacturerId
+          content:
+            application/json:
+              schema:
+                required:
+                  - manufacturerName
+                type: object
+                properties:
+                  manufacturerId:
+                    format: int32
+                    type: integer
+                  manufacturerName:
+                    minLength: 1
+                    type: string
+                  description:
+                    type: string
+                  email:
+                    type: string
+        "404":
+          description: Manufacturer does not exist for manufacturerId
+          content:
+            application/json: {}
+    put:
+      tags:
+        - manufacturer
+      parameters:
+        - name: manufacturerId
+          in: path
+          required: true
+          schema:
+            format: int32
+            type: integer
+        - name: manufacturerName
+          in: path
+          required: true
+          schema:
+            format: string
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Manufacturer'
+      responses:
+        "204":
+          description: Manufacturer updated
+          content:
+            application/json:
+              schema:
+                required:
+                  - manufacturerName
+                type: object
+                properties:
+                  manufacturerId:
+                    format: int32
+                    type: integer
+                  manufacturerName:
+                    minLength: 1
+                    type: string
+                  description:
+                    type: string
+                  email:
+                    type: string
+        "400":
+          description: Path variable manufacturerId does not match Manufacturer.manufacturerId
+          content:
+            application/json: {}
+        "404":
+          description: No Manufacturer found for manufacturerId provided
+          content:
+            application/json: {}
+components:
+  schemas:
+    Manufacturer:
+      required:
+        - manufacturerName
+      type: object
+      properties:
+        manufacturerId:
+          format: int32
+          type: integer
+        manufacturerName:
+          minLength: 1
+          type: string
+        description:
+          type: string
+        email:
+          type: string
