@@ -9,7 +9,10 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.kost.exceptions.ServiceException;
 
-
+import org.eclipse.microprofile.metrics.MetricUnits;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Gauge;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
@@ -39,6 +42,8 @@ public class ManufacturerResource {
                     schema = @Schema(type = SchemaType.ARRAY, implementation = Manufacturer.class)
             )
     )
+    @Timed(name = "manufacturersGetAllTimer", description = "A measure of how long it takes to perform the get of all entities.", unit = MetricUnits.MILLISECONDS)
+    @Counted(name = "performedGets", description = "How many all manufacturer gets have been performed.")
     public Response get() {
         return Response.ok(manufacturerService.findAll()).build();
 
