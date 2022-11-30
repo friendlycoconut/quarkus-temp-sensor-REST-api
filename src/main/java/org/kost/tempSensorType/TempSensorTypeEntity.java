@@ -1,9 +1,12 @@
 package org.kost.tempSensorType;
 
 import lombok.Data;
+import org.kost.tempSensor.TempSensorEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity(name="TempSensorType")
 @Table(name = "tempSensorType")
@@ -25,4 +28,7 @@ public class TempSensorTypeEntity {
     @Column(name = "regulating_ISO")
     @NotEmpty
     private String regulatingISO;
+
+    @OneToMany(mappedBy = "tempSensorTypeEntity")
+    private Set<TempSensorEntity> tempSensorEntities = new HashSet<>();
 }

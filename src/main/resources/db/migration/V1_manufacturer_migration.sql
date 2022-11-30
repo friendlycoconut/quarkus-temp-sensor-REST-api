@@ -1,7 +1,7 @@
 
-DROP table tempSensor;
-DROP table tempSensorType;
-DROP table manufacturer;
+DROP table IF  EXISTS tempSensor;
+DROP table IF  EXISTS tempSensorType;
+DROP table IF  EXISTS manufacturer;
 
 
 CREATE TABLE  IF NOT EXISTS manufacturer
