@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.kost.exceptions.ServiceException;
+import org.kost.tempSensorType.TempSensorTypeRepository;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,13 +20,42 @@ import java.util.Optional;
 public class TempSensorService {
     private final TempSensorRepository tempSensorRepository;
     private final TempSensorMapper tempSensorMapper;
+    private final TempSensorTypeRepository tempSensorTypeRepository;
 
     public List<TempSensor> findAll() {
-        return
-                this.tempSensorMapper.toDomainList(tempSensorRepository.findAll().list());
+        List<TempSensorEntity> allTempSensorEntity = tempSensorRepository.findAll().list();
+        List<TempSensor> tempSensors = new ArrayList<>();
+
+        for (TempSensorEntity tempSensorEntity: allTempSensorEntity){
+            Optional<TempSensor> tempSensor = tempSensorRepository.findByIdOptional(tempSensorEntity.getTempSensorId())
+                    .map(tempSensorMapper::toDomain);
+
+            if(tempSensorEntity.getTempSensorTypeEntity() != null){
+                tempSensor.get().setTempSensorTypeId(tempSensorEntity.
+                        getTempSensorTypeEntity().
+                        getTempSensorTypeId());
+            }
+
+
+            tempSensors.add(tempSensor.get());
+        }
+
+        return tempSensors;
     }
 
     public Optional<TempSensor> findById(@NonNull Integer tempSensorId) {
+       Optional<TempSensor> tempSensor = tempSensorRepository.findByIdOptional(tempSensorId)
+               .map(tempSensorMapper::toDomain);
+
+
+
+       tempSensor.get().setTempSensorTypeId(tempSensorRepository.
+                                        findByIdOptional(tempSensorId).
+                                        get().
+                                        getTempSensorTypeEntity().
+                                        getTempSensorTypeId());
+
+
         return tempSensorRepository.findByIdOptional(tempSensorId)
                 .map(tempSensorMapper::toDomain);
     }
@@ -33,6 +64,9 @@ public class TempSensorService {
     public void save(@Valid TempSensor tempSensor) {
         log.debug("Saving TempSensorType: {}", tempSensor);
         TempSensorEntity entity = tempSensorMapper.toEntity(tempSensor);
+        System.out.println(entity);
+        entity.setTempSensorTypeEntity(tempSensorTypeRepository.findById(tempSensor.tempSensorTypeId));
+        System.out.println(entity);
         tempSensorRepository.persist(entity);
         tempSensorMapper.updateDomainFromEntity(entity, tempSensor);
     }
@@ -45,6 +79,7 @@ public class TempSensorService {
         }
         TempSensorEntity entity = tempSensorRepository.findByIdOptional(tempSensor.getTempSensorId())
                 .orElseThrow(() -> new ServiceException("No tempSensor found for tempSensor[%s]", tempSensor.getTempSensorId()));
+        entity.setTempSensorTypeEntity(tempSensorTypeRepository.findById(tempSensor.tempSensorTypeId));
         tempSensorMapper.updateEntityFromDomain(tempSensor, entity);
         tempSensorRepository.persist(entity);
         tempSensorMapper.updateDomainFromEntity(entity, tempSensor);

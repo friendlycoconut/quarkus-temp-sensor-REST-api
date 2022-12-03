@@ -16,5 +16,5 @@ public class TempSensor {
     private String name;
 
     @NotNull
-    public TempSensorType tempSensorType;
+    public Integer tempSensorTypeId;
 }

@@ -125,9 +125,9 @@ public class TempSensorResource {
             description = "No tempSensorType found for tempSensorId provided",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
-    public Response put(@Parameter(name = "tempSensorTypeId", required = true) @PathParam("tempSensorId") Integer tempSensorId, @NotNull @Valid TempSensor tempSensor) {
+    public Response put(@Parameter(name = "tempSensorId", required = true) @PathParam("tempSensorId") Integer tempSensorId, @NotNull @Valid TempSensor tempSensor) {
         if (!Objects.equals(tempSensorId, tempSensor.getTempSensorId())) {
-            throw new ServiceException("Path variable tempSensorTypeId does not match TempSensorType.tempSensorTypeId");
+            throw new ServiceException("Path variable tempSensorId does not match TempSensorType.tempSensorId");
         }
         tempSensorService.update(tempSensor);
         return Response.status(Response.Status.NO_CONTENT).build();
