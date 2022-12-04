@@ -3,6 +3,7 @@ package org.kost.tempSensorType;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.opentracing.Traced;
 import org.kost.exceptions.ServiceException;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -15,6 +16,7 @@ import java.util.Optional;
 @ApplicationScoped
 @AllArgsConstructor
 @Slf4j
+@Traced
 public class TempSensorTypeService {
     private final TempSensorTypeRepository tempSensorTypeRepository;
     private final TempSensorTypeMapper tempSensorTypeMapper;

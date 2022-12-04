@@ -11,7 +11,9 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
+import org.jboss.logging.Logger;
 @ApplicationScoped
 @AllArgsConstructor
 @Slf4j
@@ -19,7 +21,10 @@ public class ManufacturerService {
     private final ManufacturerRepository manufacturerRepository;
     private final ManufacturerMapper manufacturerMapper;
 
+
     public List<Manufacturer> findAll() {
+
+
         return
                 this.manufacturerMapper.toDomainList(manufacturerRepository.findAll().list());
     }
@@ -49,5 +54,16 @@ public class ManufacturerService {
         manufacturerRepository.persist(entity);
         manufacturerMapper.updateDomainFromEntity(entity, manufacturer);
     }
+
+    @Transactional
+    public void delete(Integer manufacturerId) {
+        log.debug("Deleting Manufacturer: {}", manufacturerId);
+        List<ManufacturerEntity> list = manufacturerRepository.findAll().list();
+        ManufacturerEntity entity = manufacturerRepository.findByIdOptional(manufacturerId)
+                .orElseThrow(() -> new ServiceException("No Manufacturer found for manufacturer[%s]",manufacturerId));
+        manufacturerRepository.delete(entity);
+    }
+
+
 
 }

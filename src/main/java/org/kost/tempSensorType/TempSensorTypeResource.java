@@ -2,12 +2,15 @@ package org.kost.tempSensorType;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.faulttolerance.Retry;
+import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.jboss.logging.Logger;
 import org.kost.exceptions.ServiceException;
 import org.kost.manufacturer.Manufacturer;
 
@@ -20,6 +23,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Path("/tempSensorTypes")
 @Produces(MediaType.APPLICATION_JSON)
@@ -31,6 +36,8 @@ public class TempSensorTypeResource {
 
 
     private final TempSensorTypeService tempSensorTypeService;
+    private AtomicLong counter = new AtomicLong(0);
+    private static final Logger LOGGER = Logger.getLogger(TempSensorTypeResource.class);
 
     @GET
     @APIResponse(
@@ -41,7 +48,13 @@ public class TempSensorTypeResource {
                     schema = @Schema(type = SchemaType.ARRAY, implementation = TempSensorType.class)
             )
     )
+    @Retry(maxRetries = 5)
     public Response get() {
+        final Long invocationNumber = counter.getAndIncrement();
+
+        maybeFail(String.format("TempSensorTypeResource#get() invocation #%d failed", invocationNumber));
+
+        LOGGER.infof("TempSensorTypeResource#get() invocation #%d returning successfully", invocationNumber);
         return Response.ok(tempSensorTypeService.findAll()).build();
 
     }
@@ -63,10 +76,23 @@ public class TempSensorTypeResource {
             description = "tempSensorType does not exist for tempSensorTypeId",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
+    @Timeout(300)
     public Response getById(@Parameter(name = "tempSensorTypeId", required = true) @PathParam("tempSensorTypeId") Integer tempSensorTypeId) {
+        long started = System.currentTimeMillis();
+        final long invocationNumber = counter.getAndIncrement();
+
+        try {
+            randomDelay();
+            LOGGER.infof("tempSensorTypeResource#getById() invocation #%d returning successfully", invocationNumber);
+
         return tempSensorTypeService.findById(tempSensorTypeId)
                 .map(tempSensorType -> Response.ok(tempSensorType).build())
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
+        } catch (InterruptedException e) {
+            LOGGER.errorf("tempSensorTypeResource#getById() invocation #%d timed out after %d ms",
+                    invocationNumber, System.currentTimeMillis() - started);
+            return null;
+        }
     }
 
     @POST
@@ -131,5 +157,16 @@ public class TempSensorTypeResource {
         }
         tempSensorTypeService.update(tempSensorType);
         return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    private void maybeFail(String failureLogMessage) {
+        if (new Random().nextBoolean()) {
+            LOGGER.error(failureLogMessage);
+            throw new RuntimeException("Resource failure.");
+        }
+    }
+
+    private void randomDelay() throws InterruptedException {
+        Thread.sleep(new Random().nextInt(500));
     }
 }
