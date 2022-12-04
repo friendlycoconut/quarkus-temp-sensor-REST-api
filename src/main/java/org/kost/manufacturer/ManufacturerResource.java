@@ -1,6 +1,7 @@
 package org.kost.manufacturer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -56,6 +57,7 @@ public class ManufacturerResource {
     )
     @Timed(name = "manufacturersGetAllTimer", description = "A measure of how long it takes to perform the get of all entities.", unit = MetricUnits.MILLISECONDS)
     @Counted(name = "performedGets", description = "How many all manufacturer gets have been performed.")
+    @Retry(maxRetries = 4)
     public Response get() {
         final Long invocationNumber = counter.getAndIncrement();
 
