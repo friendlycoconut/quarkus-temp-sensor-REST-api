@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ManufacturerResource {
 
 
-    private AtomicLong counter = new AtomicLong(0);
+    private static AtomicLong counter = new AtomicLong(0);
 
 
     private final ManufacturerService manufacturerService;

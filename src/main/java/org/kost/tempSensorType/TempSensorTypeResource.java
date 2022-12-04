@@ -36,7 +36,7 @@ public class TempSensorTypeResource {
 
 
     private final TempSensorTypeService tempSensorTypeService;
-    private AtomicLong counter = new AtomicLong(0);
+    private static AtomicLong counter = new AtomicLong(0);
     private static final Logger LOGGER = Logger.getLogger(TempSensorTypeResource.class);
 
     @GET
