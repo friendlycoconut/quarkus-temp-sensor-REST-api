@@ -95,6 +95,69 @@ public class TempSensorResource {
         return Response.created(uri).entity(tempSensor).build();
     }
 
+    @PUT
+    @Path("/{tempSensorId}")
+    @APIResponse(
+            responseCode = "204",
+            description = "tempSensor updated",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(type = SchemaType.OBJECT, implementation = TempSensor.class)
+            )
+    )
+    @APIResponse(
+            responseCode = "400",
+            description = "Invalid tempSensor",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON)
+    )
+    @APIResponse(
+            responseCode = "400",
+            description = "tempSensorType object does not have tempSensorId",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON)
+    )
+    @APIResponse(
+            responseCode = "400",
+            description = "Path variable tempSensorTypeId does not match TempSensorType.tempSensorId",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON)
+    )
+    @APIResponse(
+            responseCode = "404",
+            description = "No tempSensorType found for tempSensorId provided",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON)
+    )
+    public Response put(@Parameter(name = "tempSensorId", required = true) @PathParam("tempSensorId") Integer tempSensorId, @NotNull @Valid TempSensor tempSensor) {
+        if (!Objects.equals(tempSensorId, tempSensor.getTempSensorId())) {
+            throw new ServiceException("Path variable tempSensorId does not match TempSensorType.tempSensorId");
+        }
+        tempSensorService.update(tempSensor);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
 
+
+    @DELETE
+    @Path("/{tempSensorId}")
+    @APIResponse(
+            responseCode = "204",
+            description = "TempSensor deleted",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(type = SchemaType.OBJECT, implementation = TempSensor.class)
+            )
+    )
+    @APIResponse(
+            responseCode = "400",
+            description = "Invalid TempSensor",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON)
+    )
+    @APIResponse(
+            responseCode = "404",
+            description = "No TempSensor found for tempSensorId provided",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON)
+    )
+    public Response delete(Integer tempSensorId){
+
+        tempSensorService.delete(tempSensorId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
 
 }
