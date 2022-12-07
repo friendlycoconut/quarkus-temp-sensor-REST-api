@@ -1,4 +1,17 @@
 # pv217-kost Project
+* # Project: sensors service environment
+
+* **Team:** Illia Kostenko,Ladislav Dlhopolček,Jan Seriš.
+
+* # Realised in this service functionality:
+ 
+* [x] API design presented with Swagger UI http://localhost:8080/q/swagger-ui/
+* [x] Monitoring part (Timed, Counted in ManufactureResource) http://localhost:8080/q/metrics/
+* [x] Self-healing capabilities (REtry, Timeout patterns)
+* [x] Tests
+* [x] PostreSQL DB support
+* [x] Auto HC enabled http://localhost:8080/q/health/ready
+
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
