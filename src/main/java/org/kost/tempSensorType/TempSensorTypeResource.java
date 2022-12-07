@@ -49,7 +49,7 @@ public class TempSensorTypeResource {
             )
     )
     @Retry(maxRetries = 5)
-    public Response get() {
+    public Response getAllTempSensorTypes() {
         final Long invocationNumber = counter.getAndIncrement();
 
         maybeFail(String.format("TempSensorTypeResource#get() invocation #%d failed", invocationNumber));
@@ -77,7 +77,7 @@ public class TempSensorTypeResource {
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
     @Timeout(300)
-    public Response getById(@Parameter(name = "tempSensorTypeId", required = true) @PathParam("tempSensorTypeId") Integer tempSensorTypeId) {
+    public Response getByIdTempSensorType(@Parameter(name = "tempSensorTypeId", required = true) @PathParam("tempSensorTypeId") Integer tempSensorTypeId) {
         long started = System.currentTimeMillis();
         final long invocationNumber = counter.getAndIncrement();
 
@@ -114,7 +114,7 @@ public class TempSensorTypeResource {
             description = "tempSensorType already exists for tempSensorTypeId",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
-    public Response post(@NotNull @Valid TempSensorType tempSensorType, @Context UriInfo uriInfo) {
+    public Response postCreateTempSensorType(@NotNull @Valid TempSensorType tempSensorType, @Context UriInfo uriInfo) {
 
         tempSensorTypeService.save(tempSensorType);
         URI uri = uriInfo.getAbsolutePathBuilder().path(Integer.toString(tempSensorType.getTempSensorTypeId())).build();
@@ -151,7 +151,7 @@ public class TempSensorTypeResource {
             description = "No tempSensorType found for tempSensorTypeId provided",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
-    public Response put(@Parameter(name = "tempSensorTypeId", required = true) @PathParam("tempSensorTypeId") Integer tempSensorTypeId, @NotNull @Valid TempSensorType tempSensorType) {
+    public Response putUpdateTempSensorId(@Parameter(name = "tempSensorTypeId", required = true) @PathParam("tempSensorTypeId") Integer tempSensorTypeId, @NotNull @Valid TempSensorType tempSensorType) {
         if (!Objects.equals(tempSensorTypeId, tempSensorType.getTempSensorTypeId())) {
             throw new ServiceException("Path variable tempSensorTypeId does not match TempSensorType.tempSensorTypeId");
         }

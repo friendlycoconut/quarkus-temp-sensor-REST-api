@@ -13,10 +13,8 @@ import org.kost.exceptions.ServiceException;
 
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Counted;
-import org.eclipse.microprofile.metrics.annotation.Gauge;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
@@ -58,7 +56,7 @@ public class ManufacturerResource {
     @Timed(name = "manufacturersGetAllTimer", description = "A measure of how long it takes to perform the get of all entities.", unit = MetricUnits.MILLISECONDS)
     @Counted(name = "performedGets", description = "How many all manufacturer gets have been performed.")
     @Retry(maxRetries = 4)
-    public Response get() {
+    public Response getAllManufacturers() {
         final Long invocationNumber = counter.getAndIncrement();
 
         maybeFail(String.format("ManufacturerService#findAll() invocation #%d failed", invocationNumber));
@@ -86,7 +84,7 @@ public class ManufacturerResource {
     )
     @Timed(name = "manufacturersGetIdTimer", description = "A measure of how long it takes to perform the get entity by id.", unit = MetricUnits.MILLISECONDS)
     @Counted(name = "performedGetsId", description = "How many manufacturer gets by id have been performed.")
-    public Response getById(@Parameter(name = "manufacturerId", required = true) @PathParam("manufacturerId") Integer manufacturerId) {
+    public Response getByIdManufacturer(@Parameter(name = "manufacturerId", required = true) @PathParam("manufacturerId") Integer manufacturerId) {
         return manufacturerService.findById(manufacturerId)
                 .map(manufacturer -> Response.ok(manufacturer).build())
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
@@ -111,7 +109,7 @@ public class ManufacturerResource {
             description = "Manufacturer already exists for manufacturerId",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
-    public Response post(@NotNull @Valid Manufacturer manufacturer, @Context UriInfo uriInfo) {
+    public Response postCreateManufacturer(@NotNull @Valid Manufacturer manufacturer, @Context UriInfo uriInfo) {
 
         manufacturerService.save(manufacturer);
         URI uri = uriInfo.getAbsolutePathBuilder().path(Integer.toString(manufacturer.getManufacturerId())).build();
@@ -148,7 +146,7 @@ public class ManufacturerResource {
             description = "No Manufacturer found for manufacturerId provided",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
-    public Response put(@Parameter(name = "manufacturerId", required = true) @PathParam("manufacturerId") Integer manufacturerId, @NotNull @Valid Manufacturer manufacturer) {
+    public Response putUpdateManufacturer(@Parameter(name = "manufacturerId", required = true) @PathParam("manufacturerId") Integer manufacturerId, @NotNull @Valid Manufacturer manufacturer) {
         if (!Objects.equals(manufacturerId, manufacturer.getManufacturerId())) {
             throw new ServiceException("Path variable manufacturerId does not match Manufacturer.manufacturerId");
         }
@@ -182,7 +180,7 @@ public class ManufacturerResource {
             description = "No Manufacturer found for manufacturerId provided",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
-    public Response delete(Integer manufacturerId){
+    public Response deleteManufacturer(Integer manufacturerId){
 
         manufacturerService.delete(manufacturerId);
         return Response.status(Response.Status.NO_CONTENT).build();

@@ -9,9 +9,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.kost.exceptions.ServiceException;
-import org.kost.manufacturer.Manufacturer;
 import org.kost.tempSensorType.TempSensorType;
-import org.kost.tempSensorType.TempSensorTypeService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -38,10 +36,10 @@ public class TempSensorResource {
             description = "Get All tempSensors",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(type = SchemaType.ARRAY, implementation = TempSensorType.class)
+                    schema = @Schema(type = SchemaType.ARRAY, implementation = TempSensor.class)
             )
     )
-    public Response get() {
+    public Response getAllTempSensor() {
         return Response.ok(tempSensorService.findAll()).build();
 
     }
@@ -60,10 +58,10 @@ public class TempSensorResource {
     )
     @APIResponse(
             responseCode = "404",
-            description = "tempSensorType does not exist for tempSensorTypeId",
+            description = "tempSensor does not exist for tempSensorId",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
-    public Response getById(@Parameter(name = "tempSensorId", required = true) @PathParam("tempSensorId") Integer tempSensorId) {
+    public Response getByIdTempSensor(@Parameter(name = "tempSensorId", required = true) @PathParam("tempSensorId") Integer tempSensorId) {
         return tempSensorService.findById(tempSensorId)
                 .map(tempSensor -> Response.ok(tempSensor).build())
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
@@ -88,7 +86,7 @@ public class TempSensorResource {
             description = "tempSensor already exists for tempSensorId",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
-    public Response post(@NotNull @Valid TempSensor tempSensor, @Context UriInfo uriInfo) {
+    public Response postCreateNewTempSensor(@NotNull @Valid TempSensor tempSensor, @Context UriInfo uriInfo) {
 
         tempSensorService.save(tempSensor);
         URI uri = uriInfo.getAbsolutePathBuilder().path(Integer.toString(tempSensor.getTempSensorId())).build();
@@ -117,7 +115,7 @@ public class TempSensorResource {
     )
     @APIResponse(
             responseCode = "400",
-            description = "Path variable tempSensorTypeId does not match TempSensorType.tempSensorId",
+            description = "Path variable tempSensorTypeId does not match TempSensor.tempSensorId",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
     @APIResponse(
@@ -125,9 +123,9 @@ public class TempSensorResource {
             description = "No tempSensorType found for tempSensorId provided",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
-    public Response put(@Parameter(name = "tempSensorId", required = true) @PathParam("tempSensorId") Integer tempSensorId, @NotNull @Valid TempSensor tempSensor) {
+    public Response putUpdateTempSensor(@Parameter(name = "tempSensorId", required = true) @PathParam("tempSensorId") Integer tempSensorId, @NotNull @Valid TempSensor tempSensor) {
         if (!Objects.equals(tempSensorId, tempSensor.getTempSensorId())) {
-            throw new ServiceException("Path variable tempSensorId does not match TempSensorType.tempSensorId");
+            throw new ServiceException("Path variable tempSensorId does not match TempSensor.tempSensorId");
         }
         tempSensorService.update(tempSensor);
         return Response.status(Response.Status.NO_CONTENT).build();
@@ -154,7 +152,7 @@ public class TempSensorResource {
             description = "No TempSensor found for tempSensorId provided",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
-    public Response delete(Integer tempSensorId){
+    public Response deleteTempSensor(Integer tempSensorId){
 
         tempSensorService.delete(tempSensorId);
         return Response.status(Response.Status.NO_CONTENT).build();
